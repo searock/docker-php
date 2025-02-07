@@ -1,0 +1,41 @@
+version: '3.8'
+services:
+  apache-php:
+    image: php-apache
+    build:
+      context: .
+    volumes:
+      - ${WEB_VOLUME_PATH}:/var/www/html
+    ports:
+      - 80:80
+    networks:
+      - app-network
+
+  mysql:
+    image: mysql
+    volumes:
+      - ${DB_VOLUME_PATH}:/var/lib/mysql
+    environment:
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+    networks:
+      - app-network
+
+  phpmyadmin:
+    image: phpmyadmin
+    environment:
+      PMA_HOST: mysql
+      PMA_USER: ${MYSQL_USER}
+      PMA_PASSWORD: ${MYSQL_PASSWORD}
+    ports:
+      - 8080:80
+    depends_on:
+      - mysql
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
